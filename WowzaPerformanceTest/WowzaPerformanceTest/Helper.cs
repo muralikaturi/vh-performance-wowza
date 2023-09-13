@@ -19,6 +19,7 @@ namespace WowzaPerformanceTest
                             .Get<WowzaConfiguration>();
 
             config.RestEndpoint = config.RestEndpoint.Replace("{WowzaServer}", config.WowzaServer);
+            config.RestEndpoint1 = config.RestEndpoint.Replace("{WowzaServer}", config.WowzaServer);
             config.StreamEndpoint = config.StreamEndpoint.Replace("{WowzaServer}", config.WowzaServer);
 
             return config;

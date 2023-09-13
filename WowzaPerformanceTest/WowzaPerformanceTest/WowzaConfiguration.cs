@@ -15,6 +15,7 @@ namespace WowzaPerformanceTest
 
         public string AzureStorageDirectory { get; set; }
         public string RestEndpoint { get; set; }
+        public string RestEndpoint1 { get; set; }
         public string StreamEndpoint { get; set; }
         public string StreamType { get; set; }
         public string MediaType { get; set; }

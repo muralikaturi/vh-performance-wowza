@@ -26,7 +26,7 @@ namespace WowzaPerformanceTest
         private static string streamAudioFile = wowzaConfiguration.StreamAudio;
         private static string operation = string.Empty;
         private static bool pollFlag = true;
-               
+
 
         static void Main(string[] args)
         {
@@ -38,8 +38,8 @@ namespace WowzaPerformanceTest
             {
                 Helper.PrintReadMe();
             }
-        }  
-         
+        }
+
 
         private static bool ParseArguments(string[] args)
         {
@@ -96,8 +96,8 @@ namespace WowzaPerformanceTest
                         Int32.TryParse(arg, out startCount);
                         break;
                     case ArgAppName:
-                        result = Helper.ValidateSpecialCharacters(arg,"ApplicationName");
-                        if(result) appPrefix = arg;
+                        result = Helper.ValidateSpecialCharacters(arg, "ApplicationName");
+                        if (result) appPrefix = arg;
                         break;
                     case ArgStreamName:
                         result = Helper.ValidateSpecialCharacters(arg, "StreamName");
@@ -105,7 +105,7 @@ namespace WowzaPerformanceTest
                         break;
                     case ArgStreamAudio:
                         result = Helper.ValidateFile(arg, wowzaConfiguration.WorkingDirectory);
-                        if(result) streamAudioFile = arg;
+                        if (result) streamAudioFile = arg;
                         break;
                     default:
                         break;
@@ -116,7 +116,7 @@ namespace WowzaPerformanceTest
                 prevFlag = string.Empty;
             }
 
-            result = Helper.ValidateFile(streamAudioFile,wowzaConfiguration.WorkingDirectory);
+            result = Helper.ValidateFile(streamAudioFile, wowzaConfiguration.WorkingDirectory);
 
             return result;
         }
@@ -140,7 +140,7 @@ namespace WowzaPerformanceTest
                 case "delete":
                     Console.WriteLine("Deleting Application(s)...");
                     WowzaApi.DeleteApplications(appPrefix, count, startCount);
-                    break;               
+                    break;
                 case "h":
                 case "help":
                     Helper.PrintReadMe();
@@ -156,7 +156,7 @@ namespace WowzaPerformanceTest
         private static async void ProcessMultipleStreams(bool skipCreation = false, bool skipPublish = false)
         {
 
-            Monitor(skipPublish,"Start");
+            Monitor(skipPublish, "Start");
 
             List<Task> taskList = new List<Task>();
             Stopwatch stopWatch = new Stopwatch();
@@ -167,15 +167,15 @@ namespace WowzaPerformanceTest
 
             for (var i = startCount; i <= (startCount - 1 + count); i++)
             {
-                var appName = $"{appPrefix}{i}";
-                var streamName = appName.Replace(appPrefix, streamPrefix);
-                CreateAndProcessStream(appName, streamName,taskList, skipCreation, skipPublish);
+                //var appName = $"{appPrefix}{i}";
+                var streamName = $"{streamPrefix}{i}";//appName.Replace(appPrefix, streamPrefix);
+                CreateAndProcessStream(appPrefix, streamName, taskList, skipCreation, skipPublish);
                 Thread.Sleep(1000);
 
                 var currTime = stopWatch.Elapsed.TotalSeconds;
                 if (currTime > interval)
                 {
-                    Monitor(skipPublish,counter.ToString());
+                    Monitor(skipPublish, counter.ToString());
                     counter++;
                     interval = interval * counter;
                 }
@@ -183,12 +183,12 @@ namespace WowzaPerformanceTest
 
             Task.WaitAll(taskList.ToArray());
 
-            Monitor(skipPublish,"End");
+            Monitor(skipPublish, "End");
             stopWatch.Stop();
 
         }
 
-        private static void Monitor(bool skipPublish,string eventName)
+        private static void Monitor(bool skipPublish, string eventName)
         {
             if (!skipPublish)
             {
@@ -196,12 +196,12 @@ namespace WowzaPerformanceTest
                 Thread.Sleep(1000);
             }
         }
-         
+
         private static async void CreateAndProcessStream(string applicationName, string streamName, List<Task> taskList, bool skipCreation = false, bool skipPublish = false)
         {
             var result = false;
 
-            if(!skipCreation)
+            if (!skipCreation)
             {
                 var tc = WowzaApi.CreateApplication(applicationName);
                 var tu = WowzaApi.UpdateApplication(applicationName);
@@ -210,8 +210,8 @@ namespace WowzaPerformanceTest
                 result = tu.Result && tc.Result;
             }
 
-            if (!skipPublish &&  (result || skipCreation))
-            { 
+            if (!skipPublish && (result || skipCreation))
+            {
                 Console.WriteLine($"Publishing to stream {streamName}");
                 Console.WriteLine("----------------------------------");
                 taskList.Add(StreamAudio.ProcessRTMP(applicationName, streamName, streamAudioFile, WowzaApi));
